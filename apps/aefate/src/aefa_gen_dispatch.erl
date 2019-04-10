@@ -25,20 +25,24 @@ gen_dispatch(Filename) ->
 gen_eval(#{ opname            := Name
           , end_bb            := true
           , format            := atomic
+          , gas               := Gas
           , constructor       := Constructor
           }) ->
     io_lib:format(
-      "eval(~w, EngineState) ->\n"
-      "    aefa_fate_op:~w(EngineState);\n",
-      [Name, Constructor]);
+      "eval(~w,  #{ gas := Gas } = EngineState) ->\n"
+      "    EngineState1 = EngineState#{ gas => Gas - ~w},\n"
+      "    aefa_fate_op:~w(EngineState1);\n",
+      [Name, Gas, Constructor]);
 gen_eval(#{ opname            := Name
           , format            := atomic
+          , gas               := Gas
           , constructor       := Constructor
           }) ->
     io_lib:format(
-      "eval(~w, EngineState) ->\n"
-      "    {next, aefa_fate_op:~w(EngineState)};\n",
-      [Name, Constructor]);
+      "eval(~w, #{ gas := Gas } = EngineState) ->\n"
+      "    EngineState1 = EngineState#{ gas => Gas - ~w},\n"
+      "    {next, aefa_fate_op:~w(EngineState1)};\n",
+      [Name, Gas, Constructor]);
 gen_eval(#{ opname            := Name
           , opcode            :=_OpCode
           , args              := Arity
@@ -47,7 +51,7 @@ gen_eval(#{ opname            := Name
           , macro             :=_Macro
           , type_name         :=_TypeName
           , doc               :=_Doc
-          , gas               :=_Gas
+          , gas               := Gas
           , type              :=_Type
           , constructor       := Constructor
           , constructor_type  :=_ConstructorType
@@ -55,9 +59,10 @@ gen_eval(#{ opname            := Name
     Args  = gen_arg_matches(FateFormat, 0),
     CArgs = [io_lib:format("Arg~w, ", [N]) || N <- lists:seq(0, Arity-1)],
     io_lib:format(
-      "eval({~w ~s}, EngineState) ->\n"
-      "    aefa_fate_op:~w(~sEngineState);\n",
-      [Name, Args, Constructor, CArgs]);
+      "eval({~w ~s}, #{ gas := Gas } = EngineState) ->\n"
+      "    EngineState1 = EngineState#{ gas => Gas - ~w},\n"
+      "    aefa_fate_op:~w(~sEngineState1);\n",
+      [Name, Args, Gas, Constructor, CArgs]);
 gen_eval(#{ opname            := Name
           , opcode            :=_OpCode
           , args              := Arity
@@ -66,7 +71,7 @@ gen_eval(#{ opname            := Name
           , macro             :=_Macro
           , type_name         :=_TypeName
           , doc               :=_Doc
-          , gas               :=_Gas
+          , gas               := Gas
           , type              :=_Type
           , constructor       := Constructor
           , constructor_type  :=_ConstructorType
@@ -74,9 +79,10 @@ gen_eval(#{ opname            := Name
     Args  = gen_arg_matches(FateFormat, 0),
     CArgs = [io_lib:format("Arg~w, ", [N]) || N <- lists:seq(0, Arity-1)],
     io_lib:format(
-      "eval({~w ~s}, EngineState) ->\n"
-      "    {next, aefa_fate_op:~w(~sEngineState)};\n",
-      [Name, Args, Constructor, CArgs]).
+      "eval({~w ~s}, #{ gas := Gas } = EngineState) ->\n"
+      "    EngineState1 = EngineState#{ gas => Gas - ~w},\n"
+      "    {next, aefa_fate_op:~w(~sEngineState1)};\n",
+      [Name, Args, Gas, Constructor, CArgs]).
 
 
 
