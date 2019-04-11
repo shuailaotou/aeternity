@@ -17,4 +17,4 @@
 -record(aec_tx_location        , {key, value}).
 -record(aec_tx_pool            , {key, value}).
 -record(aec_discovered_pof     , {key, value}).
-
+-record(aec_tx_gc              , {key, value}).
